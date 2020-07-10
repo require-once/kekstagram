@@ -196,21 +196,28 @@ var hashTagsInput = document.querySelector('input[name=hashtags]');
 var descriptionInput = document.querySelector('textarea[name=description]');
 var uploadButton = document.querySelector('#upload-submit');
 
+var forbidFormSend = function(elem, errorText, evt) {
+	evt.preventDefault();
+	elem.setCustomValidity(errorText);
+	elem.style.border = '2px solid red';
+};
+
+var allowFormSend = function(elem) {
+	elem.setCustomValidity('');
+	elem.style.border = '';
+};
+
 
 uploadButton.addEventListener('click', function(evt) {
 	
 	if (descriptionInput.value !== '') {
 		if (descriptionInput.value.length > 140) {
-			evt.preventDefault();
-			descriptionInput.setCustomValidity('Комментарий не длиннее 140 символов');
-			descriptionInput.style.border = '2px solid red';
+			forbidFormSend(descriptionInput, 'Комментарий не длиннее 140 символов', evt)
 		} else {
-			descriptionInput.setCustomValidity('');
-			descriptionInput.style.border = '';
+			allowFormSend(descriptionInput);
 		}
 	} else {
-		descriptionInput.setCustomValidity('');
-		descriptionInput.style.border = '';
+		allowFormSend(descriptionInput);
 	}
 	
 	if (hashTagsInput.value !== '') {
@@ -221,37 +228,25 @@ uploadButton.addEventListener('click', function(evt) {
 			item = item.toLowerCase();
 			
 			if (item.substring(0, 1) !== '#') {
-				evt.preventDefault();
-				hashTagsInput.setCustomValidity('Хэштэг должен начинаться с #');
-				hashTagsInput.style.border = '2px solid red';
+				forbidFormSend(hashTagsInput, 'Хэштэг должен начинаться с #', evt)
 			} else if (item == '#') {
-				evt.preventDefault();
-				hashTagsInput.setCustomValidity('Хэштэг не должен быть пустым');
-				hashTagsInput.style.border = '2px solid red';
+				forbidFormSend(hashTagsInput, 'Хэштэг не должен быть пустым', evt);
 			} else if (item.length > 20) {
-				evt.preventDefault();
-				hashTagsInput.setCustomValidity('Максимальная длина хэштэга - 20 символов');
-				hashTagsInput.style.border = '2px solid red';
+				forbidFormSend(hashTagsInput, 'Максимальная длина хэштэга - 20 символов', evt);
 			}	else if (tagsArr.indexOf(item) !== -1) {
-				evt.preventDefault();
-				hashTagsInput.setCustomValidity('Хэштэги не должны повторяться');
-				hashTagsInput.style.border = '2px solid red';
+				forbidFormSend(hashTagsInput, 'Хэштэги не должны повторяться', evt);
 			} else {
 				tagsArr.push(item);
 				
 				if (tagsArr.length > 5) {
-					evt.preventDefault();
-					hashTagsInput.setCustomValidity('Не более 5-ти хэштэгов');
-					hashTagsInput.style.border = '2px solid red';
+					forbidFormSend(hashTagsInput, 'Не более 5-ти хэштэгов', evt);
 				} else {
-					hashTagsInput.setCustomValidity('');
-					hashTagsInput.style.border = '';
+					allowFormSend(hashTagsInput);
 				}
 			}
 		});
 	} else {
-		hashTagsInput.setCustomValidity('');
-		hashTagsInput.style.border = '';
+		allowFormSend(hashTagsInput);
 	}
 });
 
