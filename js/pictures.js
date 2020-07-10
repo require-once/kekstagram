@@ -126,7 +126,7 @@ var uploadForm = document.querySelector('.img-upload__overlay');
 var closeButton = document.querySelector('#upload-cancel');
 
 var onUploadFormCloseButtonPress = function(evt) {
-	if (evt.keyCode === ESC_KEYCODE) {
+	if (evt.keyCode === ESC_KEYCODE && evt.target !== hashTagsInput && evt.target !== descriptionInput) {
 		closeUploadForm();
 	}
 };
@@ -184,10 +184,76 @@ effectInput.parentNode.parentNode.addEventListener('change', function(evt) {
 /* Показ большой фотки по клику по миниатюре */
 var miniatures = document.querySelectorAll('.pictures.container a');
 
-miniatures.forEach(function(currentItem, index) {
-	currentItem.addEventListener('click', function() {
+miniatures.forEach(function(item, index) {
+	item.addEventListener('click', function() {
 		showBigPicture(index);
 	});
 });
+
+
+/* Валидация хэш-тэгов и комментария */
+var hashTagsInput = document.querySelector('input[name=hashtags]');
+var descriptionInput = document.querySelector('textarea[name=description]');
+var uploadButton = document.querySelector('#upload-submit');
+
+
+uploadButton.addEventListener('click', function(evt) {
+	
+	if (descriptionInput.value !== '') {
+		if (descriptionInput.value.length > 140) {
+			evt.preventDefault();
+			descriptionInput.setCustomValidity('Комментарий не длиннее 140 символов');
+			descriptionInput.style.border = '2px solid red';
+		} else {
+			descriptionInput.setCustomValidity('');
+			descriptionInput.style.border = '';
+		}
+	} else {
+		descriptionInput.setCustomValidity('');
+		descriptionInput.style.border = '';
+	}
+	
+	if (hashTagsInput.value !== '') {
+		var hashTags = hashTagsInput.value.split(' ');
+		var tagsArr = [];
+		
+		hashTags.forEach(function(item) {
+			item = item.toLowerCase();
+			
+			if (item.substring(0, 1) !== '#') {
+				evt.preventDefault();
+				hashTagsInput.setCustomValidity('Хэштэг должен начинаться с #');
+				hashTagsInput.style.border = '2px solid red';
+			} else if (item == '#') {
+				evt.preventDefault();
+				hashTagsInput.setCustomValidity('Хэштэг не должен быть пустым');
+				hashTagsInput.style.border = '2px solid red';
+			} else if (item.length > 20) {
+				evt.preventDefault();
+				hashTagsInput.setCustomValidity('Максимальная длина хэштэга - 20 символов');
+				hashTagsInput.style.border = '2px solid red';
+			}	else if (tagsArr.indexOf(item) !== -1) {
+				evt.preventDefault();
+				hashTagsInput.setCustomValidity('Хэштэги не должны повторяться');
+				hashTagsInput.style.border = '2px solid red';
+			} else {
+				tagsArr.push(item);
+				
+				if (tagsArr.length > 5) {
+					evt.preventDefault();
+					hashTagsInput.setCustomValidity('Не более 5-ти хэштэгов');
+					hashTagsInput.style.border = '2px solid red';
+				} else {
+					hashTagsInput.setCustomValidity('');
+					hashTagsInput.style.border = '';
+				}
+			}
+		});
+	} else {
+		hashTagsInput.setCustomValidity('');
+		hashTagsInput.style.border = '';
+	}
+});
+
 
 
