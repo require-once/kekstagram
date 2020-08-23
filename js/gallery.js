@@ -2,6 +2,9 @@
 
 (function() {
 	
+	var USER_PHOTOS = [];
+	
+	
 	/* Отрисовка фоток пользователей */
 	var renderPictures = function(user_photos) {
 		var template = document.querySelector('#picture').content.querySelector('a');
@@ -18,8 +21,6 @@
 		userPictures.appendChild(fragment);
 	}
 
-	renderPictures(window.user_photos);
-
 
 	/* Обработчики закрытия большой фотки */
 	var onBigPictureCloseButtonPress = function(evt) {
@@ -33,47 +34,56 @@
 		document.querySelector('.big-picture').classList.add('hidden');
 		document.removeEventListener('keydown', onBigPictureCloseButtonPress);
 	};
-
+	
 
 	/* Показ большой фотки */
 	var showBigPicture = function(index) {
 		document.body.classList.add('modal-open');
 		document.querySelector('.big-picture').classList.remove('hidden');
-		document.querySelector('.big-picture__img img').src = window.user_photos[index].url;
-		document.querySelector('.big-picture__img img').alt = window.user_photos[index].description;
-		document.querySelector('.likes-count').textContent = window.user_photos[index].likes;
-		document.querySelector('.comments-count').textContent = window.user_photos[index].comments.length;
-		document.querySelector('.social__comment .social__picture').src = 'img/avatar-' + window.utils.getRandomInteger(1, 6) + '.svg';
-		document.querySelector('.social__caption').textContent = window.user_photos[index].description;
+		document.querySelector('.big-picture__img img').src = USER_PHOTOS[index].url;
+		document.querySelector('.big-picture__img img').alt = USER_PHOTOS[index].description;
+		document.querySelector('.likes-count').textContent = USER_PHOTOS[index].likes;
+		document.querySelector('.comments-count').textContent = USER_PHOTOS[index].comments.length;
+		document.querySelector('.social__caption').textContent = USER_PHOTOS[index].description;
 		
-		var socialComment = document.querySelector('.social__comments');
-		var commentsTexts = document.querySelectorAll('.social__comment .social__text');
+		var socialComments = document.querySelector('.social__comments');
+		socialComments.innerHTML = '';
 		
-		if (window.user_photos[index].comments.length === 1) {
-			commentsTexts[0].textContent = window.user_photos[index].comments[0];
-			socialComment.children[1].classList.add('hidden');
-		} else if (window.user_photos[index].comments.length === 2) {
-			socialComment.children[1].classList.remove('hidden');
-			commentsTexts[0].textContent = window.user_photos[index].comments[0];
-			commentsTexts[1].textContent = window.user_photos[index].comments[1];
+		var template = document.querySelector('#comment').content.querySelector('.social__comment');
+		var fragment = document.createDocumentFragment();
+			
+		for (var i = 0; i < USER_PHOTOS[index].comments.length; i++) {
+			template.querySelector('img').src = USER_PHOTOS[index].comments[i].avatar;
+			template.querySelector('.social__text').textContent = USER_PHOTOS[index].comments[i].message;
+			fragment.appendChild(template.cloneNode(true));
 		}
+		
+		socialComments.appendChild(fragment);
 		
 		document.querySelector('.big-picture #picture-cancel').addEventListener('click', closeBigPicture);
 		document.addEventListener('keydown', onBigPictureCloseButtonPress);
 	};
 
-
 	document.querySelector('.social__comment-count').classList.add('visually-hidden');
 	document.querySelector('.social__comments-loader').classList.add('visually-hidden');
 
 
-	/* Показ большой фотки при клике по миниатюре */
-	var miniatures = document.querySelectorAll('.pictures.container a');
+	/* Обработчик успешной загрузки фоток пользователей */
+	var successHandler = function(photos) {
+		//console.log(photos);
+		USER_PHOTOS = photos;
+		renderPictures(photos);
+		
+		/* Показ большой фотки при клике по миниатюре */
+		var miniatures = document.querySelectorAll('.pictures.container a');
 
-	miniatures.forEach(function(item, index) {
-		item.addEventListener('click', function() {
-			showBigPicture(index);
+		miniatures.forEach(function(item, index) {
+			item.addEventListener('click', function() {
+				showBigPicture(index);
+			});
 		});
-	});
+	};
+	
+	window.backend.load(successHandler, window.backend.errorHandler);
 
 })();
