@@ -2,7 +2,7 @@
 
 (function() {
 	
-	/* Загрузка новой фотки */
+	/* Окно загрузки новой фотки */
 	var uploadFileInput = document.querySelector('#upload-file');
 	var uploadForm = document.querySelector('.img-upload__overlay');
 	var closeButton = document.querySelector('#upload-cancel');
@@ -30,7 +30,7 @@
 	closeButton.addEventListener('click', function() {
 		closeUploadForm();
 	}); 
-	 
+
 
 	/* Изменение масштаба */
 	var scaleSmallerButton = document.querySelector('.img-upload__overlay .scale__control--smaller');
@@ -145,6 +145,32 @@
 		
 		document.addEventListener('mousemove', onMouseMove);
 		document.addEventListener('mouseup', onMouseUp);
+	});
+
+
+	/* Отправка данных на сервер */
+	var form = document.querySelector('#upload-select-image');
+	form.addEventListener('submit', function(evt) {
+		evt.preventDefault();
+		
+		var successHandler = function(data) {
+			//console.log(data);
+			closeUploadForm();	
+			form.reset();
+			
+			scaleValueInput.value = '100%';
+			imagePreview.style.transform = 'scale(1)';
+			
+			imagePreview.className = 'img-upload__preview';
+			imagePreview.style.filter = '';
+			
+			effectLevelInput.value = 100;
+			wholeSlider.classList.add('hidden');
+			pin.style.left = '450px';
+			levelDepth.style.width = '450px';
+		};
+		
+		window.backend.send(new FormData(form), successHandler, window.backend.errorHandler);
 	});
 
 })();
