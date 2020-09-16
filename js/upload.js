@@ -95,7 +95,7 @@
 		
 		var onMouseMove = function(moveEvt) {
 			moveEvt.preventDefault();
-			
+      
 			if (startCoords.x >= 400 && startCoords.x <= 850) {
 				var shift = {
 					x: startCoords.x - moveEvt.clientX,
@@ -154,7 +154,6 @@
 		evt.preventDefault();
 		
 		var successHandler = function(data) {
-			//console.log(data);
 			closeUploadForm();	
 			form.reset();
 			
