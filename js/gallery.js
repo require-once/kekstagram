@@ -119,7 +119,9 @@
   var onFilterDiscussedClick = function() {
     
     var discussedPhotos = USER_PHOTOS.slice().sort(function(a, b) {
-      return b.comments.length - a.comments.length;
+      if (b.comments.length > a.comments.length) return 1;
+			else if (b.comments.length < a.comments.length) return -1;
+			else return b.likes - a.likes;
     });
     
     var userPictures = document.querySelector('.pictures');
