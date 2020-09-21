@@ -163,11 +163,12 @@
 			});
 			
 			if (matches) {
+				wholeSlider.classList.add('hidden');
+				imagePreview.className = 'img-upload__preview';
+				resetEffects();
 				var reader = new FileReader();
 				
 				reader.addEventListener('load', function() {
-					imagePreview.className = 'img-upload__preview';
-					resetEffects();
 					previewImg.src = reader.result;
 				});
 				
