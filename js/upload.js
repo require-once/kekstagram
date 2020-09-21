@@ -9,7 +9,9 @@
 	
 	var hashTagsInput = document.querySelector('input[name=hashtags]');
 	var descriptionInput = document.querySelector('textarea[name=description]');
-
+	
+	
+	/* Обработчик закрытия формы загрузки */
 	var onUploadFormCloseButtonPress = function(evt) {
 		if (evt.keyCode === window.utils.ESC_KEYCODE && evt.target !== hashTagsInput && evt.target !== descriptionInput) {
 			closeUploadForm();
@@ -21,16 +23,10 @@
 		document.removeEventListener('keydown', onUploadFormCloseButtonPress);
 	};
 
-
-	uploadFileInput.addEventListener('change', function() {
-		uploadForm.classList.remove('hidden');
-		document.addEventListener('keydown', onUploadFormCloseButtonPress);
-	});
-
 	closeButton.addEventListener('click', function() {
 		closeUploadForm();
 	}); 
-
+	
 
 	/* Изменение масштаба */
 	var scaleSmallerButton = document.querySelector('.img-upload__overlay .scale__control--smaller');
@@ -46,7 +42,7 @@
 			imagePreview.style.transform = 'scale(' + (resizeValue + 25) / 100 + ')';
 		}
 	});
-
+	
 	scaleSmallerButton.addEventListener('click', function() {
 		var resizeValue = parseInt(scaleValueInput.value);
 		
@@ -64,6 +60,13 @@
 	var pin = document.querySelector('.effect-level__pin');
 	var levelDepth = document.querySelector('.effect-level__depth');
 
+	var resetEffects = function() {
+		imagePreview.style.filter = '';
+		effectLevelInput.value = 100;
+		pin.style.left = '450px';
+		levelDepth.style.width = '450px';
+	};
+
 	effectInput.parentNode.parentNode.addEventListener('change', function(evt) {
 		imagePreview.className = 'img-upload__preview';
 		imagePreview.classList.add('effects__preview--' + evt.target.value);
@@ -74,10 +77,7 @@
 			wholeSlider.classList.remove('hidden');
 		}
 		
-		imagePreview.style.filter = '';
-		effectLevelInput.value = 100;
-		pin.style.left = '450px';
-		levelDepth.style.width = '450px';
+		resetEffects();
 	});
 
 
@@ -128,13 +128,13 @@
 			upEvt.preventDefault();
 			
 			if (startCoords.x < 400) {
-				startCoords.x = 400;		
+				startCoords.x = 400;
 				pin.style.left = '0px';
 				levelDepth.style.width = '0px';
 			}
 			
 			if (startCoords.x > 850) {
-				startCoords.x = 850;		
+				startCoords.x = 850;
 				pin.style.left = '450px';
 				levelDepth.style.width = '450px';
 			}
@@ -146,6 +146,36 @@
 		document.addEventListener('mousemove', onMouseMove);
 		document.addEventListener('mouseup', onMouseUp);
 	});
+
+
+	/* Предпросмотр загружаемой фотографии */
+		var FILE_TYPES = ['gif', 'jpg', 'jpeg', 'png'];
+		var previewImg = document.querySelector('.img-upload__preview img');
+		
+		uploadFileInput.addEventListener('change', function() {
+			uploadForm.classList.remove('hidden');
+			
+			var file = uploadFileInput.files[0];
+			var fileName = file.name.toLowerCase();
+			
+			var matches = FILE_TYPES.some(function(item) {
+				return fileName.endsWith(item);
+			});
+			
+			if (matches) {
+				var reader = new FileReader();
+				
+				reader.addEventListener('load', function() {
+					imagePreview.className = 'img-upload__preview';
+					resetEffects();
+					previewImg.src = reader.result;
+				});
+				
+				reader.readAsDataURL(file);
+			}
+			
+			document.addEventListener('keydown', onUploadFormCloseButtonPress);
+		});
 
 
 	/* Отправка данных на сервер */
